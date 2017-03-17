@@ -86,7 +86,7 @@ def mapping_medical_specialty(s,p):
 # function which maps the different readmittance states to number.
 def mapping_readmittance(s):
     readmitted_value_mapping = {
-        'NO':-1,
+        'NO':0,
         '>30':0,
         '<30':1
     }
