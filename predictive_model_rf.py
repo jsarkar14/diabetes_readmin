@@ -69,8 +69,12 @@ for index in xrange(N_cross_validations):
     score = log_loss(Y_test, rf_probs)
 
     print 'Score for the',index + 1,'-th iteration is =',score
-    print confusion_matrix(Y_test, Y_pred)
+    cm = confusion_matrix(Y_test, Y_pred).astype(float)
+    cm[0,:] = cm[0,:]/np.float(len(list4))
+    cm[1,:] = cm[1,:]/np.float(len(list6))
+    cm[2,:] = cm[2,:]/np.float(len(list2))
 
+    print cm
     # x = np.argsort(RF.feature_importances_)
     # print 'Decreasing oder of Importance of features in prediction of 30 day readmission probability', '\n', [column_names[i] for i in x]
 
