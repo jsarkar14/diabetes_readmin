@@ -13,20 +13,19 @@ column_names = df.columns.values.tolist()
 # Determining the total number of rows and columns
 df_nrows, df_ncols = df.shape
 
-# This code is not super-generalized so it assumes that the user knows that there are 3 outcomes
+# This code is not super-generalized so it assumes that the user knows that there are 2 outcomes
 # as defined in the other file (for more documentation check mapping_readmittance() in the other file
+
 Positive_indices = df[df['readmitted'] == 1].index.tolist()
 Zero_indices = df[df['readmitted'] == 0].index.tolist()
-# Negative_indices = df[df['readmitted'] == -1].index.tolist()
+
 
 # We are using a 50/50 split for train and split
-train_test_ratio_positive = 0.4
+train_test_ratio_positive = 0.5
 
 positive_zero_ratio = np.float(len(Positive_indices)) / np.float(len(Zero_indices))
-# positive_negative_ratio = np.float(len(Positive_indices)) / np.float(len(Negative_indices))
 
 train_test_ratio_zero = train_test_ratio_positive*positive_zero_ratio
-# train_test_ratio_negative = train_test_ratio_positive*positive_negative_ratio
 
 N_cross_validations = 1
 
@@ -37,7 +36,6 @@ for index in xrange(N_cross_validations):
     # Sampling is done separately for sampling adjusted to the rate of occurrence of actual outcomes
     list1, list2 = train_test_split(Positive_indices, test_size=1.0 - train_test_ratio_positive)
     list3, list4 = train_test_split(Zero_indices, test_size=1.-train_test_ratio_zero)
-    # list5, list6 = train_test_split(Negative_indices, test_size=1.-train_test_ratio_negative)
 
     # the 3 lists are now joined to form a training and test set indices and the indices are shuffled
     training_indices = np.random.permutation(np.append(list1, list3))
@@ -70,15 +68,25 @@ for index in xrange(N_cross_validations):
     score = log_loss(Y_test, rf_probs)
 
     print 'Score for the',index + 1,'-th iteration is =',score
+
+    # Calculating the most important factors as observed in the RF
+    x = np.argsort(RF.feature_importances_)
+    print 'Decreasing oder of Importance of features in prediction of 30 day readmission probability', '\n', [column_names[i] for i in x]
+
+    # Calculating the Confusion Matrix and storing it as a float
     cm = confusion_matrix(Y_test, Y_pred).astype(float)
+
+    # Normalizing the confusion matrix to get error rates
     cm[0,:] = cm[0,:]/np.float(len(list4))
     cm[1,:] = cm[1,:]/np.float(len(list2))
     print cm
+
+    # Calculating the AUC-ROC for the model
     print roc_auc_score(Y_test, rf_probs[:,1])
-    fpr, tpr, thresholds = roc_curve(Y_test,rf_probs[:,1])
+
+    # Generating the ROC curve and plotting
+    fpr, tpr, _ = roc_curve(Y_test,rf_probs[:,1])
     py.plot(fpr, tpr)
     py.show()
 
-    x = np.argsort(RF.feature_importances_)
-    print 'Decreasing oder of Importance of features in prediction of 30 day readmission probability', '\n', [column_names[i] for i in x]
 

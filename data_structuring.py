@@ -150,9 +150,3 @@ if __name__ == '__main__':
     df = read_filter_clean_map_csv()
     n,m = df.shape
     print n,m
-
-    cols = df.columns.values.tolist()
-    print cols
-    for c in cols:
-        print c, df[c].unique()
-
