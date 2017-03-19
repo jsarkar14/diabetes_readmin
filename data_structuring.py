@@ -102,6 +102,8 @@ def read_data(filename,nrows=None, cols = None):
     if not cols == None:
         cols_to_read = cols
 
+    # reading the data into a dataframe for a given number of rows & columns as specified
+    # further several of the fields are converted to numnbers using the mapping functions
     x = pd.read_csv(filename,nrows=nrows_to_read, usecols=cols_to_read, converters={
         'age':mapping_age,
         'race':str,
